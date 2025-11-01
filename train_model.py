@@ -60,9 +60,9 @@ with torch.no_grad():
     print(f"Accuracy: {acc * 100:.2f}%")
 
 # Save model and vectorizer
-torch.save(model.state_dict(), "model.pt")
+torch.save(model.state_dict(), "models/model.pt")
 import pickle
-with open("vectorizer.pkl", "wb") as f:
+with open("models/vectorizer.pkl", "wb") as f:
     pickle.dump(vectorizer, f)
 
 print("Model and vectorizer saved!")

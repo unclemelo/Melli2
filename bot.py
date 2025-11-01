@@ -50,7 +50,7 @@ def log(msg: str, level: str = "info"):
 # AI Setup
 ai_manager = AIManager("models/model.pt", "models/vectorizer.pkl")
 last_channel_creation = datetime.min
-CHANNEL_COOLDOWN = timedelta(minutes=1)
+CHANNEL_COOLDOWN = timedelta(minutes=0.1)
 TRUSTED_DEVS = [954135885392252940, 667032667732312115]
 
 # ──────────────────────────────────────────────
