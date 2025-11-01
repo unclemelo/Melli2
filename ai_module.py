@@ -88,18 +88,17 @@ class AIManager:
         X_tensor = torch.tensor(X, dtype=torch.float32)
         with torch.no_grad():
             pred = self.model(X_tensor)
-            return pred.item() > 0.5
+            return pred.item() > 0.6
 
     def suggest_channel_name(self, message: str) -> str:
-        stop_words = {"a", "an", "the", "for", "we", "should", "can", "let’s", "have", "place", "make", "me", "melli"}
-        words = [w for w in re.sub(r"[^a-z0-9\s]", "", message.lower()).split() if w not in stop_words]
+        stop_words = {"a", "an", "the", "for", "we", "should", "can", "lets", "have", "place", "make", "melli", "channel", "called", "create"}
+        message = re.sub(r"[’']", "'", message.lower())     # Normalize apostrophes
+        words = re.findall(r"\b[a-z0-9]{2,}\b", message)    # Extract only alphanumeric words
+        words = [w for w in words if w not in stop_words]   # Filter out stop words
         if not words:
             return "new-channel"
-        # Use past feedback to improve naming
-        for fb in self.feedback_log[::-1]:  # check most recent feedback first
-            if fb["reaction"] == "up" and fb["message"].lower() == message.lower():
-                return fb["suggested_name"]
-        return "-".join(words[:3])[:90]
+        else:
+            return "-".join(words[:3])[:90]
 
     # -----------------------------
     # Mood system

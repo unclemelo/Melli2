@@ -48,7 +48,7 @@ def log(msg: str, level: str = "info"):
 
 # ──────────────────────────────────────────────
 # AI Setup
-ai_manager = AIManager("models/model.pt", "models/vectorizer.pkl")
+ai_manager = AIManager()
 last_channel_creation = datetime.min
 CHANNEL_COOLDOWN = timedelta(minutes=0.1)
 TRUSTED_DEVS = [954135885392252940, 667032667732312115]
@@ -72,7 +72,30 @@ async def on_message(message):
     global last_channel_creation
     now = datetime.now()
 
+    if message.content.lower().startswith("clear"):
+        await message.channel.send("Clearing all 'new-channel' channels...")
+        for channel in message.guild.channels:
+            if isinstance(channel, discord.TextChannel) and channel.name.startswith("new-channel"):
+                try:
+                    await channel.delete()
+                    log(f"Deleted channel '{channel.name}' in {message.guild.name}", "info")
+                except Exception as e:
+                    log(f"Failed to delete channel '{channel.name}': {e}", "error")
+
+    if message.content.lower().startswith("clear recent"):
+        await message.channel.send("Clearing channels created in the last 2 hours...")
+        cutoff = now - timedelta(hours=2)
+        for channel in message.guild.channels:
+            if isinstance(channel, discord.TextChannel) and channel.created_at.replace(tzinfo=None) >= cutoff:
+                try:
+                    await channel.delete()
+                    log(f"Deleted recent channel '{channel.name}' in {message.guild.name}", "info")
+                except Exception as e:
+                    log(f"Failed to delete channel '{channel.name}': {e}", "error")
+
     if ai_manager.should_create_channel(message.content):
+        prob = ai_manager.should_create_channel(message.content)
+        log(f"Channel creation probability: {prob:.4f}", "debug")
         if now - last_channel_creation >= CHANNEL_COOLDOWN:
             guild = message.guild
             channel_name = ai_manager.suggest_channel_name(message.content)
@@ -84,9 +107,11 @@ async def on_message(message):
             except Exception as e:
                 log(f"Failed to create channel: {e}", "error")
         else:
-            log("Channel creation skipped due to cooldown.", "warn")
-
+            remaining = (CHANNEL_COOLDOWN - (now - last_channel_creation)).total_seconds()
+            log(f"Cooldown active, retry in {remaining:.1f}s", "info")
+    
     await client.process_commands(message)
+
 
 @client.event
 async def on_reaction_add(reaction, user):
