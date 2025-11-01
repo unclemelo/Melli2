@@ -9,7 +9,11 @@ import re
 import random
 
 class AIManager:
-    def __init__(self, model_path: str, vectorizer_path: str, save_file: str = "data/melli_data.json", feedback_file: str = "data/feedback.json"):
+    def __init__(self, 
+                 model_path: str = "models/model.pt", 
+                 vectorizer_path: str = "models/vectorizer.pkl", 
+                 save_file: str = "data/melli_data.json", 
+                 feedback_file: str = "data/feedback.json"):
         self.save_file = save_file
         self.feedback_file = feedback_file
 
