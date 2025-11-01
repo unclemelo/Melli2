@@ -91,7 +91,7 @@ class AIManager:
             return pred.item() > 0.5
 
     def suggest_channel_name(self, message: str) -> str:
-        stop_words = {"a", "an", "the", "for", "we", "should", "can", "let’s", "have", "place", "make", "me"}
+        stop_words = {"a", "an", "the", "for", "we", "should", "can", "let’s", "have", "place", "make", "me", "melli"}
         words = [w for w in re.sub(r"[^a-z0-9\s]", "", message.lower()).split() if w not in stop_words]
         if not words:
             return "new-channel"
